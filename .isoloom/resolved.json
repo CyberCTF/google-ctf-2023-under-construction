@@ -1,0 +1,314 @@
+{
+  "generated_by_isoloom": "from isoloom.yml; don't edit: change the spec and run `isoloom generate` (`isoloom check` fails when this file is out of date)",
+  "resolved_version": 1,
+  "name": "google-ctf-2023-under-construction",
+  "instance": null,
+  "inputs": [],
+  "networks": {
+    "lab": {
+      "cidr": "10.60.171.0/24",
+      "docker_cidr": "10.60.171.0/24",
+      "internet": false,
+      "gateway": null,
+      "gateway_address": "10.60.171.1",
+      "router": null,
+      "controller": "10.60.171.253"
+    }
+  },
+  "reach": [],
+  "machines": {
+    "under-construction-mysql": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.171.12"
+      },
+      "docker_addresses": {
+        "lab": "10.60.171.12"
+      },
+      "services": [
+        {
+          "port": 3306,
+          "name": "mysql",
+          "http": false,
+          "publish": null
+        }
+      ],
+      "depends_on": [],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 768,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "under-construction-php": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.171.11"
+      },
+      "docker_addresses": {
+        "lab": "10.60.171.11"
+      },
+      "services": [
+        {
+          "port": 1337,
+          "name": "web",
+          "http": true,
+          "publish": 1338
+        }
+      ],
+      "depends_on": [
+        "under-construction-mysql"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 256,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "under-construction": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.171.10"
+      },
+      "docker_addresses": {
+        "lab": "10.60.171.10"
+      },
+      "services": [
+        {
+          "port": 1337,
+          "name": "web",
+          "http": true,
+          "publish": 1337
+        }
+      ],
+      "depends_on": [
+        "under-construction-mysql",
+        "under-construction-php"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 512,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    }
+  },
+  "start_order": [
+    "under-construction-mysql",
+    "under-construction-php",
+    "under-construction"
+  ],
+  "clones": {},
+  "tools": {},
+  "groups": {},
+  "router": null,
+  "controller": {
+    "addresses": {
+      "lab": "10.60.171.253"
+    }
+  },
+  "published": [
+    {
+      "machine": "under-construction-php",
+      "port": 1337,
+      "host_port": 1338
+    },
+    {
+      "machine": "under-construction",
+      "port": 1337,
+      "host_port": 1337
+    }
+  ],
+  "targets": {
+    "possible": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "generated": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "refused": {},
+    "not_possible": {
+      "hybrid": "only when some machines are containers and others are VMs",
+      "vagrant": "needs `vm:` on under-construction-mysql, under-construction-php, under-construction",
+      "proxmox": "needs `vm:` on under-construction-mysql, under-construction-php, under-construction",
+      "cloud-vm": "needs `vm:` on under-construction-mysql, under-construction-php, under-construction",
+      "external": "needs `external:` on under-construction-mysql, under-construction-php, under-construction"
+    }
+  },
+  "checks": {
+    "default_position": "networks",
+    "positions": [
+      {
+        "position": "networks",
+        "machine": null,
+        "runner": "isoloom-check",
+        "checks": [
+          {
+            "name": "the Flask site answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://under-construction:1337/",
+            "expect": "any",
+            "wait": 180
+          },
+          {
+            "name": "the PHP site answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://under-construction-php:1337/",
+            "expect": "200",
+            "wait": 120
+          },
+          {
+            "name": "the Flask signup form offers the account tiers",
+            "derived": false,
+            "kind": "script",
+            "target": "checks/probe.sh",
+            "expect": "",
+            "wait": 60
+          }
+        ]
+      },
+      {
+        "position": "under-construction-mysql",
+        "machine": "under-construction-mysql",
+        "runner": "isoloom-check-under-construction-mysql",
+        "checks": [
+          {
+            "name": "under-construction-php:1337 from under-construction-mysql",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.171.11:1337/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "under-construction:1337 from under-construction-mysql",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.171.10:1337/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "no internet from under-construction-mysql",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "under-construction-php",
+        "machine": "under-construction-php",
+        "runner": "isoloom-check-under-construction-php",
+        "checks": [
+          {
+            "name": "under-construction-mysql:3306 from under-construction-php",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.171.12:3306",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "under-construction:1337 from under-construction-php",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.171.10:1337/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "no internet from under-construction-php",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "under-construction",
+        "machine": "under-construction",
+        "runner": "isoloom-check-under-construction",
+        "checks": [
+          {
+            "name": "under-construction-mysql:3306 from under-construction",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.171.12:3306",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "under-construction-php:1337 from under-construction",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.171.11:1337/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "no internet from under-construction",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      }
+    ]
+  },
+  "message": "Under Construction (Google, 2023): the Flask site answers at http://localhost:1337/\nand the PHP site at http://localhost:1338/.\nSign up on Flask, log in on PHP: do both read your signup request the same way?\n"
+}

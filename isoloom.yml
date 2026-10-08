@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# Under Construction (Google's 2023 security competition, by Google; a web challenge) as an Isoloom spec:
+# a Flask site that forwards each signup's raw query string to a PHP site sharing its MySQL database
+# (HTTP parameter pollution). The challenge folders 2023/quals/web-under-construction and
+# web-under-construction-php of Google's challenge archive are vendored unchanged in build/<machine>/app/,
+# each built by an overlay Dockerfile next to it (upstream's, with challenge.yaml's environment baked in).
+# `isoloom generate`, then `isoloom run docker`.
+version: 1
+name: google-ctf-2023-under-construction
+
+networks:
+  lab: { cidr: 10.60.171.0/24, internet: false }
+
+machines:
+  under-construction-mysql:
+    networks: { lab: 12 }
+    services: [{ port: 3306, name: mysql }]
+    resources: { cpus: 1, memory_mb: 768 }
+    docker:
+      build: build/under-construction-mysql
+  under-construction-php:
+    networks: { lab: 11 }
+    services: [{ port: 1337, name: web, http: true, publish: 1338 }]
+    resources: { cpus: 1, memory_mb: 256 }
+    depends_on: [under-construction-mysql]
+    docker:
+      build: build/under-construction-php
+  under-construction:
+    networks: { lab: 10 }
+    services: [{ port: 1337, name: web, http: true, publish: 1337 }]
+    resources: { cpus: 1, memory_mb: 512 }
+    privileged: true  # the challenge image's setup script mounts /proc at start
+    depends_on: [under-construction-mysql, under-construction-php]
+    docker:
+      build: build/under-construction
+
+checks:
+  - name: the Flask site answers
+    http: http://under-construction:1337/
+    expect: any
+    wait: 180
+  - name: the PHP site answers
+    http: http://under-construction-php:1337/
+    wait: 120
+  - name: the Flask signup form offers the account tiers
+    script: checks/probe.sh
+    wait: 60
+
+message: |
+  Under Construction (Google, 2023): the Flask site answers at http://localhost:{{ machines.under-construction.services.0.publish }}/
+  and the PHP site at http://localhost:{{ machines.under-construction-php.services.0.publish }}/.
+  Sign up on Flask, log in on PHP: do both read your signup request the same way?
