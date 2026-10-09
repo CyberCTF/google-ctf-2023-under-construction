@@ -4,12 +4,5 @@
   "question": "Retrieve the flag from the PHP site.",
   "category": "WEB",
   "difficulty": 2,
-  "evidence_kind": "SECRET",
-  "capabilities": [
-    "http-parameter-pollution",
-    "flask",
-    "php",
-    "parser-differential",
-    "access-control"
-  ]
+  "evidence_kind": "SECRET"
 }
