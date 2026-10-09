@@ -9,6 +9,9 @@ services:
   under-construction-mysql:
     build:
       context: ../../build/under-construction-mysql
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: google-ctf-2023-under-construction
     image: isoloom/google-ctf-2023-under-construction-under-construction-mysql
     platform: linux/amd64
     hostname: under-construction-mysql
@@ -38,6 +41,8 @@ services:
           memory: 768M
     labels:
       isoloom.service.mysql: tcp:3306
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
     restart: unless-stopped
   under-construction-mysql-routes:
     image: alpine:3.20
@@ -59,9 +64,15 @@ services:
       under-construction-mysql:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
   under-construction-php:
     build:
       context: ../../build/under-construction-php
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: google-ctf-2023-under-construction
     image: isoloom/google-ctf-2023-under-construction-under-construction-php
     platform: linux/amd64
     hostname: under-construction-php
@@ -97,6 +108,8 @@ services:
           memory: 256M
     labels:
       isoloom.service.web: http:1337
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
     restart: unless-stopped
   under-construction-php-routes:
     image: alpine:3.20
@@ -118,9 +131,15 @@ services:
       under-construction-php:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
   under-construction:
     build:
       context: ../../build/under-construction
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: google-ctf-2023-under-construction
     image: isoloom/google-ctf-2023-under-construction-under-construction
     platform: linux/amd64
     privileged: true
@@ -161,6 +180,8 @@ services:
           memory: 512M
     labels:
       isoloom.service.web: http:1337
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
     restart: unless-stopped
   under-construction-routes:
     image: alpine:3.20
@@ -182,6 +203,9 @@ services:
       under-construction:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
   isoloom-check:
     image: curlimages/curl:8.11.1
     profiles:
@@ -211,6 +235,9 @@ services:
         condition: service_healthy
       under-construction-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
   isoloom-check-under-construction-mysql:
     image: curlimages/curl:8.11.1
     profiles:
@@ -234,6 +261,9 @@ services:
         condition: service_healthy
       under-construction-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
   isoloom-check-under-construction-php:
     image: curlimages/curl:8.11.1
     profiles:
@@ -257,6 +287,9 @@ services:
         condition: service_healthy
       under-construction-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
   isoloom-check-under-construction:
     image: curlimages/curl:8.11.1
     profiles:
@@ -280,6 +313,9 @@ services:
         condition: service_healthy
       under-construction-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
   isoloom-probe-amd64:
     image: busybox:1.37.0-musl
     platform: linux/amd64
@@ -291,11 +327,20 @@ services:
     - isoloom-probe-amd64:/probe
     network_mode: none
     restart: no
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
 networks:
   lab:
     ipam:
       config:
       - subnet: 10.60.171.0/24
         gateway: 10.60.171.1
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
 volumes:
-  isoloom-probe-amd64: {}
+  isoloom-probe-amd64:
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction

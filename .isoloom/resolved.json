@@ -178,7 +178,8 @@
       "vagrant": "needs `vm:` on under-construction-mysql, under-construction-php, under-construction",
       "proxmox": "needs `vm:` on under-construction-mysql, under-construction-php, under-construction",
       "cloud-vm": "needs `vm:` on under-construction-mysql, under-construction-php, under-construction",
-      "external": "needs `external:` on under-construction-mysql, under-construction-php, under-construction"
+      "external": "needs `external:` on under-construction-mysql, under-construction-php, under-construction",
+      "cloud-services": "left out by `targets:`"
     }
   },
   "checks": {
