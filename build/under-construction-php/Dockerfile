@@ -3,6 +3,8 @@
 # - the COPY sources point into app/challenge/ (this folder is the build context);
 # - the environment upstream sets in challenge.yaml (Kubernetes env and secret, the flag included)
 #   is baked in with ENV: the same values, since Isoloom has no per-machine environment.
+# - CyberCTF: a PHP prepend file sets FLAG from /ctf/flag (the player's flag, written by
+#   ctf/flag.sh at every start) for each request; without the file, the ENV value below.
 # Everything else is upstream's, line for line.
 
 FROM php:8.2-apache
@@ -15,6 +17,9 @@ RUN apt-get update && \
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY app/challenge/ports.conf /etc/apache2/
 COPY app/challenge/src/ /var/www/html
+
+RUN printf '%s\n' '<?php' 'if (is_readable("/ctf/flag")) { putenv("FLAG=" . trim(file_get_contents("/ctf/flag"))); }' > /usr/local/etc/php/ctf-flag.php && \
+    printf 'auto_prepend_file=/usr/local/etc/php/ctf-flag.php\n' > /usr/local/etc/php/conf.d/ctf-flag.ini
 
 VOLUME /var/run
 

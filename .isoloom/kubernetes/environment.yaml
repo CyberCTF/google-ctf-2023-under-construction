@@ -8,6 +8,7 @@
 #   docker build -t isoloom/google-ctf-2023-under-construction-under-construction-mysql build/under-construction-mysql
 #   docker build -t isoloom/google-ctf-2023-under-construction-under-construction-php build/under-construction-php
 #   docker build -t isoloom/google-ctf-2023-under-construction-under-construction build/under-construction
+# Inputs (optional, unset ones are empty): kubectl -n isoloom-google-ctf-2023-under-construction create secret generic isoloom-inputs --from-literal=CTF_FLAG_MAIN=…
 
 apiVersion: v1
 kind: Namespace
@@ -155,19 +156,68 @@ spec:
             - /.isoloom-probe/busybox nc -z -w 2 127.0.0.1 1337
           periodSeconds: 5
           failureThreshold: 60
+        env:
+        - name: CTF_FLAG_MAIN
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_MAIN
+              optional: true
         resources:
           limits:
             cpu: '1'
             memory: 256Mi
         volumeMounts:
+        - name: vol-ctf
+          mountPath: /ctf
         - name: isoloom-probe
           mountPath: /.isoloom-probe
           readOnly: true
+      - name: init
+        image: isoloom/google-ctf-2023-under-construction-under-construction-php
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - until /.isoloom-probe/busybox nc -z -w 2 127.0.0.1 1337; do sleep 2; done && sh /isoloom/scripts/ctf__flag.sh && exec sleep infinity
+        env:
+        - name: CTF_FLAG_MAIN
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_MAIN
+              optional: true
+        volumeMounts:
+        - name: vol-ctf
+          mountPath: /ctf
+        - name: isoloom-probe
+          mountPath: /.isoloom-probe
+          readOnly: true
+        - name: scripts
+          mountPath: /isoloom/scripts
       nodeSelector:
         kubernetes.io/arch: amd64
       volumes:
+      - name: vol-ctf
+        persistentVolumeClaim:
+          claimName: under-construction-php-ctf
+      - name: scripts
+        configMap:
+          name: isoloom-scripts
+          defaultMode: 493
       - name: isoloom-probe
         emptyDir: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: under-construction-php-ctf
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
 ---
 apiVersion: v1
 kind: Service

@@ -1,0 +1,53 @@
+{
+  "objectives": [
+    {
+      "key": "main",
+      "title": "Log in as a gold member",
+      "prompt": "Get a gold-tier account on the PHP site and read the flag it shows after login.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "CTF{%s}"
+      },
+      "dev": "CTF{dev-google-ctf-2023-under-construction}",
+      "hints": [
+        "Sign up on Flask, log in on PHP: the signup's raw query string is forwarded as is.",
+        "Do Flask and PHP read a repeated parameter the same way?"
+      ],
+      "steps": [
+        {
+          "key": "frontend",
+          "title": "Identify the signup site",
+          "prompt": "Which Python framework runs the signup site?",
+          "check": {
+            "answer": [
+              "flask"
+            ]
+          }
+        },
+        {
+          "key": "tier",
+          "title": "Find the target tier",
+          "prompt": "Which account tier sees the flag?",
+          "check": {
+            "answer": [
+              "gold"
+            ]
+          }
+        },
+        {
+          "key": "class",
+          "title": "Name the vulnerability class",
+          "prompt": "What vulnerability class exploits two components parsing duplicate parameters differently?",
+          "check": {
+            "answer": [
+              "http parameter pollution",
+              "parameter pollution",
+              "hpp",
+              "parser differential"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -79,8 +79,13 @@ services:
     networks:
       lab:
         ipv4_address: 10.60.171.11
+    environment:
+      CTF_FLAG_MAIN: ${CTF_FLAG_MAIN:-}
     ports:
     - ${ISOLOOM_PUBLISH_ADDRESS:-127.0.0.1}:${ISOLOOM_PUBLISH_FIXED:+1338}:1337
+    volumes:
+    - under-construction-php-ctf:/ctf
+    - isoloom-probe-amd64:/.isoloom-probe:ro
     healthcheck:
       test:
       - CMD
@@ -92,8 +97,6 @@ services:
       timeout: 3s
       retries: 60
       start_period: 10s
-    volumes:
-    - isoloom-probe-amd64:/.isoloom-probe:ro
     depends_on:
       isoloom-probe-amd64:
         condition: service_completed_successfully
@@ -134,6 +137,26 @@ services:
     labels:
       isoloom.managed: 'true'
       isoloom.environment: google-ctf-2023-under-construction
+  under-construction-php-init-1:
+    image: isoloom/google-ctf-2023-under-construction-under-construction-php
+    entrypoint:
+    - /bin/sh
+    - /isoloom/init/flag.sh
+    volumes:
+    - ../../ctf/flag.sh:/isoloom/init/flag.sh:ro
+    - under-construction-php-ctf:/ctf
+    network_mode: service:under-construction-php
+    environment:
+      CTF_FLAG_MAIN: ${CTF_FLAG_MAIN:-}
+    depends_on:
+      under-construction-php:
+        condition: service_healthy
+      under-construction-php-routes:
+        condition: service_healthy
+    restart: no
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
   under-construction:
     build:
       context: ../../build/under-construction
@@ -171,6 +194,8 @@ services:
         condition: service_healthy
       under-construction-php:
         condition: service_healthy
+      under-construction-php-init-1:
+        condition: service_completed_successfully
       under-construction-php-routes:
         condition: service_healthy
     deploy:
@@ -229,6 +254,8 @@ services:
         condition: service_healthy
       under-construction-php:
         condition: service_healthy
+      under-construction-php-init-1:
+        condition: service_completed_successfully
       under-construction-php-routes:
         condition: service_healthy
       under-construction:
@@ -255,6 +282,8 @@ services:
         condition: service_healthy
       under-construction-php:
         condition: service_healthy
+      under-construction-php-init-1:
+        condition: service_completed_successfully
       under-construction-php-routes:
         condition: service_healthy
       under-construction:
@@ -281,6 +310,8 @@ services:
         condition: service_healthy
       under-construction-php:
         condition: service_healthy
+      under-construction-php-init-1:
+        condition: service_completed_successfully
       under-construction-php-routes:
         condition: service_healthy
       under-construction:
@@ -307,6 +338,8 @@ services:
         condition: service_healthy
       under-construction-php:
         condition: service_healthy
+      under-construction-php-init-1:
+        condition: service_completed_successfully
       under-construction-php-routes:
         condition: service_healthy
       under-construction:
@@ -340,6 +373,10 @@ networks:
       isoloom.managed: 'true'
       isoloom.environment: google-ctf-2023-under-construction
 volumes:
+  under-construction-php-ctf:
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: google-ctf-2023-under-construction
   isoloom-probe-amd64:
     labels:
       isoloom.managed: 'true'

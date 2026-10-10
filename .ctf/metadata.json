@@ -1,7 +1,7 @@
 {
   "title": "Google CTF 2023: Under Construction",
   "description": "Two sites share one MySQL database: a Flask site where anyone signs up for a low tier, and a PHP site that shows the flag to gold-tier users. Flask forwards each signup's raw query string to PHP.",
-  "question": "Retrieve the flag from the PHP site.",
+  "question": "Get a gold-tier account and read the flag the PHP site shows after login.",
   "category": "WEB",
   "difficulty": 2,
   "evidence_kind": "SECRET"
