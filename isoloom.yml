@@ -45,12 +45,13 @@ machines:
     networks: {lab: 10}
     resources: {cpus: 1, memory_mb: 512}
     privileged: true  # the challenge image's setup script mounts /proc at start
+    seal: best-effort  # privileged on a sealed (internet: false) network: the seal is advisory here
     depends_on: [under-construction-mysql, under-construction-php]
     ports:
       web:
         port: 1337
         protocol: http
-        publish: true
+        publish: 8081
     app:
       build: build/under-construction
 checks:
